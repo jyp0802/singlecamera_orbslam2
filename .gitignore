@@ -1,0 +1,12 @@
+CMakeLists.txt.user
+KeyFrameTrajectory.txt
+Thirdparty/DBoW2/build/
+Thirdparty/DBoW2/lib/
+Thirdparty/g2o/build/
+Thirdparty/g2o/config.h
+Thirdparty/g2o/lib/
+Vocabulary/ORBvoc.txt
+build/
+*~
+lib/
+
