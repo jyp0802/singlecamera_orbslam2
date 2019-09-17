@@ -58,6 +58,7 @@ target_link_libraries(${PROJECT_NAME}
   ${EIGEN3_LIBS}
   ${Pangolin_LIBRARIES}
   ${THIRDPARTY_LIBRARIES}
+  -lboost_serialization
 )
 
 set(PROJECT_INCLUDE_DIRS

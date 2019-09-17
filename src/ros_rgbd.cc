@@ -25,6 +25,7 @@
 #include<chrono>
 
 #include<ros/ros.h>
+#include <ros/package.h>
 #include <cv_bridge/cv_bridge.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
@@ -57,15 +58,22 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "rgbd_slam");
     ros::start();
 
-    if(argc != 5)
+    if(argc != 7)
     {
-        cerr << endl << "Usage: rosrun singlecamera_orbslam2 rgbd_slam path_to_vocabulary path_to_settings from_tf to_tf" << endl;        
+        cerr << endl << "Usage: rosrun singlecamera_orbslam2 rgbd_slam path_to_vocabulary path_to_settings from_tf to_tf load_map save_map" << endl;        
         ros::shutdown();
         return 1;
     }
 
+    string load_map = argv[5];
+    string save_map = argv[6];
+    if (load_map != "none")
+        load_map = ros::package::getPath("singlecamera_orbslam2") + "/Maps/" + load_map;
+    if (save_map != "none")
+        save_map = ros::package::getPath("singlecamera_orbslam2") + "/Maps/" + save_map;
+
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::RGBD,false);
+    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::RGBD,true,load_map,save_map);
 
     ImageGrabber igb(&SLAM);
 

@@ -36,6 +36,9 @@
 #include "ORBVocabulary.h"
 #include "Viewer.h"
 
+#include "BoostArchiver.h"
+#include <fstream>
+
 namespace ORB_SLAM2
 {
 
@@ -59,7 +62,7 @@ public:
 public:
 
     // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and Viewer threads.
-    System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor, const bool bUseViewer = true);
+    System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor, const bool bUseViewer = true, string loadMap = "none", string saveMap = "none");
 
     // Proccess the given stereo frame. Images must be synchronized and rectified.
     // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to grayscale.
@@ -113,8 +116,8 @@ public:
     void SaveTrajectoryKITTI(const string &filename);
 
     // TODO: Save/Load functions
-    // SaveMap(const string &filename);
-    // LoadMap(const string &filename);
+    void SaveMap(const string &filename);
+    bool LoadMap(const string &filename);
 
     // Information from most recent processed frame
     // You can call this right after TrackMonocular (or stereo or RGBD)
@@ -174,6 +177,11 @@ private:
     std::vector<MapPoint*> mTrackedMapPoints;
     std::vector<cv::KeyPoint> mTrackedKeyPointsUn;
     std::mutex mMutexState;
+    
+    // Save map
+    string mSaveMap;
+    string mLoadMap;
+    string mapfile;
 };
 
 }// namespace ORB_SLAM
