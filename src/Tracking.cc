@@ -802,6 +802,12 @@ bool Tracking::TrackReferenceKeyFrame()
 
 void Tracking::UpdateLastFrame()
 {
+    if (mlRelativeFramePoses.size() < 2)
+    {
+        cout << "mlRelativeFramePoses size less than 2" << endl;
+        return;
+    }
+
     // Update pose according to reference keyframe
     KeyFrame* pRef = mLastFrame.mpReferenceKF;
     cv::Mat Tlr = mlRelativeFramePoses.back();
