@@ -41,6 +41,7 @@ cv::Mat FrameDrawer::DrawFrame()
     vector<cv::KeyPoint> vIniKeys; // Initialization: KeyPoints in reference frame
     vector<int> vMatches; // Initialization: correspondeces with reference keypoints
     vector<cv::KeyPoint> vCurrentKeys; // KeyPoints in current frame
+    vector<cv::Rect> vCurrentObjects; // Avoiding Objects in current frame
     vector<bool> vbVO, vbMap; // Tracked MapPoints in current frame
     int state; // Tracking state
 
@@ -56,18 +57,21 @@ cv::Mat FrameDrawer::DrawFrame()
         if(mState==Tracking::NOT_INITIALIZED)
         {
             vCurrentKeys = mvCurrentKeys;
+            vCurrentObjects = mvCurrentObjects;
             vIniKeys = mvIniKeys;
             vMatches = mvIniMatches;
         }
         else if(mState==Tracking::OK)
         {
             vCurrentKeys = mvCurrentKeys;
+            vCurrentObjects = mvCurrentObjects;
             vbVO = mvbVO;
             vbMap = mvbMap;
         }
         else if(mState==Tracking::LOST)
         {
             vCurrentKeys = mvCurrentKeys;
+            vCurrentObjects = mvCurrentObjects;
         }
     } // destroy scoped mutex -> release mutex
 
@@ -117,6 +121,13 @@ cv::Mat FrameDrawer::DrawFrame()
                 }
             }
         }
+    }
+
+    const int nOb = vCurrentObjects.size();
+    for(int i=0; i<nOb; i++)
+    {
+        cv::Rect r = vCurrentObjects[i];
+        rectangle(im, r.tl(), r.br(), cv::Scalar(255,0,0), 2);
     }
 
     cv::Mat imWithInfo;
@@ -170,6 +181,7 @@ void FrameDrawer::Update(Tracking *pTracker)
     pTracker->mImGray.copyTo(mIm);
     mvCurrentKeys=pTracker->mCurrentFrame.mvKeys;
     N = mvCurrentKeys.size();
+    mvCurrentObjects=pTracker->mCurrentFrame.mvObjects;
     mvbVO = vector<bool>(N,false);
     mvbMap = vector<bool>(N,false);
     mbOnlyTracking = pTracker->mbOnlyTracking;

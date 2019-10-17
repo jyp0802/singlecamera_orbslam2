@@ -35,6 +35,8 @@
 
 #include<opencv2/core/core.hpp>
 
+#include <darknet_ros_msgs/BoundingBoxes.h>
+
 #include"System.h"
 
 using namespace std;
@@ -44,7 +46,7 @@ class ImageGrabber
 public:
     ImageGrabber(ORB_SLAM2::System* pSLAM):mpSLAM(pSLAM){}
 
-    void GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const sensor_msgs::ImageConstPtr& msgD);
+    void GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const sensor_msgs::ImageConstPtr& msgD,const darknet_ros_msgs::BoundingBoxes::ConstPtr& msgObjects);
 
     ORB_SLAM2::System* mpSLAM;
 
@@ -74,11 +76,13 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/camera/color/image_raw", 1);
+    // message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/camera/color/image_raw", 1);
+    message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/darknet_ros/original_image", 1);
     message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, "/camera/depth/image_rect_raw", 1);
-    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> sync_pol;
-    message_filters::Synchronizer<sync_pol> sync(sync_pol(10), rgb_sub,depth_sub);
-    sync.registerCallback(boost::bind(&ImageGrabber::GrabRGBD,&igb,_1,_2));
+    message_filters::Subscriber<darknet_ros_msgs::BoundingBoxes> object_sub(nh, "/darknet_ros/bounding_boxes", 1);
+    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, darknet_ros_msgs::BoundingBoxes> sync_pol;
+    message_filters::Synchronizer<sync_pol> sync(sync_pol(10), rgb_sub,depth_sub,object_sub);
+    sync.registerCallback(boost::bind(&ImageGrabber::GrabRGBD,&igb,_1,_2,_3));
 
     ros::spin();
 
@@ -105,7 +109,7 @@ tf::Quaternion hamiltonProduct(tf::Quaternion a, tf::Quaternion b) {
 	return c;
 }
 
-void ImageGrabber::GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const sensor_msgs::ImageConstPtr& msgD)
+void ImageGrabber::GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const sensor_msgs::ImageConstPtr& msgD,const darknet_ros_msgs::BoundingBoxes::ConstPtr& msgObjects)
 {
     // Copy the ros image message to cv::Mat.
     cv_bridge::CvImageConstPtr cv_ptrRGB;
@@ -130,7 +134,20 @@ void ImageGrabber::GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const senso
         return;
     }
 
-    cv::Mat pose = mpSLAM->TrackRGBD(cv_ptrRGB->image,cv_ptrD->image,cv_ptrRGB->header.stamp.toSec());
+    int n = msgObjects->bounding_boxes.size();
+    int x, y, w, h;
+    std::vector<cv::Rect> objects;
+    objects.reserve(n);
+    for (int i = 0; i < n; i++)
+    {
+        x = msgObjects->bounding_boxes[i].xmin;
+        y = msgObjects->bounding_boxes[i].ymin;
+        w = msgObjects->bounding_boxes[i].xmax - x;
+        h = msgObjects->bounding_boxes[i].ymax - y;
+        objects.push_back(cv::Rect(x, y, w, h));
+    }
+
+    cv::Mat pose = mpSLAM->TrackRGBD(cv_ptrRGB->image,cv_ptrD->image,cv_ptrRGB->header.stamp.toSec(),objects);
 
     if (pose.empty())
         return;

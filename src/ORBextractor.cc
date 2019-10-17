@@ -59,6 +59,7 @@
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <vector>
+#include <iostream>
 
 #include "ORBextractor.h"
 
@@ -1041,7 +1042,7 @@ static void computeDescriptors(const Mat& image, vector<KeyPoint>& keypoints, Ma
 }
 
 void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPoint>& _keypoints,
-                      OutputArray _descriptors)
+                      OutputArray _descriptors, vector<cv::Rect>& _objects)
 { 
     if(_image.empty())
         return;
@@ -1055,6 +1056,27 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
     vector < vector<KeyPoint> > allKeypoints;
     ComputeKeyPointsOctTree(allKeypoints);
     //ComputeKeyPointsOld(allKeypoints);
+
+    float scale = 1;
+    for (int level = 0; level < nlevels; ++level)
+    {
+        if (level != 0)
+            scale = mvScaleFactor[level];
+        vector<KeyPoint>& keypoints = allKeypoints[level];
+        for (auto kp = keypoints.begin(); kp != keypoints.end(); ++kp)
+        {
+            (*kp).pt *= scale;
+            for (vector<Rect>::iterator it = _objects.begin(); it != _objects.end(); ++it)
+            {
+                if ((*it).contains((*kp).pt))
+                {
+                    keypoints.erase(kp);
+                    kp--;
+                    break;
+                }
+            }
+        }
+    }
 
     Mat descriptors;
 
@@ -1092,13 +1114,13 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
         offset += nkeypointsLevel;
 
         // Scale keypoint coordinates
-        if (level != 0)
-        {
-            float scale = mvScaleFactor[level]; //getScale(level, firstLevel, scaleFactor);
-            for (vector<KeyPoint>::iterator keypoint = keypoints.begin(),
-                 keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint)
-                keypoint->pt *= scale;
-        }
+        // if (level != 0)
+        // {
+        //     float scale = mvScaleFactor[level]; //getScale(level, firstLevel, scaleFactor);
+        //     for (vector<KeyPoint>::iterator keypoint = keypoints.begin(),
+        //          keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint)
+        //         keypoint->pt *= scale;
+        // }
         // And add the keypoints to the output
         _keypoints.insert(_keypoints.end(), keypoints.begin(), keypoints.end());
     }

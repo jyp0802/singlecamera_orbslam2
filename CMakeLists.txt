@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_filters
   cv_bridge
   tf
+  darknet_ros_msgs
 )
 
 find_package(OpenCV  REQUIRED)
@@ -106,6 +107,7 @@ target_link_libraries(mono_slam_node ${LIBRARIES})
 
 # Node for RGB-D camera
 add_executable(rgbd_slam_node src/ros_rgbd.cc )
+add_dependencies(rgbd_slam_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rgbd_slam_node ${LIBRARIES})
 
 # Node for stereo camera
