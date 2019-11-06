@@ -137,6 +137,8 @@ public:
     std::vector<cv::KeyPoint> mvKeys, mvKeysRight;
     std::vector<cv::KeyPoint> mvKeysUn;
 
+    // Vector of keypoints that were eliminated and bounding boxes for eliminated objects
+    std::vector<cv::KeyPoint> mvEliminatedKeys, mvEliminatedKeysRight;
     std::vector<cv::Rect> mvObjects, mvObjectsRight;
 
     // Corresponding stereo coordinate and depth for each keypoint.

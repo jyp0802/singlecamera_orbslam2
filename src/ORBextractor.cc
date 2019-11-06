@@ -1042,7 +1042,7 @@ static void computeDescriptors(const Mat& image, vector<KeyPoint>& keypoints, Ma
 }
 
 void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPoint>& _keypoints,
-                      OutputArray _descriptors, vector<cv::Rect>& _objects)
+                      OutputArray _descriptors, vector<KeyPoint>& _eliminatedKeypoints, vector<cv::Rect>& _objects)
 { 
     if(_image.empty())
         return;
@@ -1070,6 +1070,7 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
             {
                 if ((*it).contains((*kp).pt))
                 {
+                    _eliminatedKeypoints.push_back(*kp);
                     keypoints.erase(kp);
                     kp--;
                     break;

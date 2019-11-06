@@ -41,6 +41,7 @@ cv::Mat FrameDrawer::DrawFrame()
     vector<cv::KeyPoint> vIniKeys; // Initialization: KeyPoints in reference frame
     vector<int> vMatches; // Initialization: correspondeces with reference keypoints
     vector<cv::KeyPoint> vCurrentKeys; // KeyPoints in current frame
+    vector<cv::KeyPoint> vEliminatedKeys; // Eliminated KeyPoints in current frame
     vector<cv::Rect> vCurrentObjects; // Avoiding Objects in current frame
     vector<bool> vbVO, vbMap; // Tracked MapPoints in current frame
     int state; // Tracking state
@@ -57,6 +58,7 @@ cv::Mat FrameDrawer::DrawFrame()
         if(mState==Tracking::NOT_INITIALIZED)
         {
             vCurrentKeys = mvCurrentKeys;
+            vEliminatedKeys = mvEliminatedKeys;
             vCurrentObjects = mvCurrentObjects;
             vIniKeys = mvIniKeys;
             vMatches = mvIniMatches;
@@ -64,6 +66,7 @@ cv::Mat FrameDrawer::DrawFrame()
         else if(mState==Tracking::OK)
         {
             vCurrentKeys = mvCurrentKeys;
+            vEliminatedKeys = mvEliminatedKeys;
             vCurrentObjects = mvCurrentObjects;
             vbVO = mvbVO;
             vbMap = mvbMap;
@@ -71,6 +74,7 @@ cv::Mat FrameDrawer::DrawFrame()
         else if(mState==Tracking::LOST)
         {
             vCurrentKeys = mvCurrentKeys;
+            vEliminatedKeys = mvEliminatedKeys;
             vCurrentObjects = mvCurrentObjects;
         }
     } // destroy scoped mutex -> release mutex
@@ -121,8 +125,25 @@ cv::Mat FrameDrawer::DrawFrame()
                 }
             }
         }
+        // Show the eliminated keypoints in red
+        const int en = vEliminatedKeys.size();
+        for(int i=0;i<en;i++)
+        {
+            if(vbVO[i] || vbMap[i])
+            {
+                cv::Point2f pt1,pt2;
+                pt1.x=vEliminatedKeys[i].pt.x-r;
+                pt1.y=vEliminatedKeys[i].pt.y-r;
+                pt2.x=vEliminatedKeys[i].pt.x+r;
+                pt2.y=vEliminatedKeys[i].pt.y+r;
+
+                cv::rectangle(im,pt1,pt2,cv::Scalar(0,0,255));
+                cv::circle(im,vEliminatedKeys[i].pt,2,cv::Scalar(0,0,255),-1);
+            }
+        }
     }
 
+    // Show the bounding boxes for objects that are eliminated
     const int nOb = vCurrentObjects.size();
     for(int i=0; i<nOb; i++)
     {
@@ -181,6 +202,7 @@ void FrameDrawer::Update(Tracking *pTracker)
     pTracker->mImGray.copyTo(mIm);
     mvCurrentKeys=pTracker->mCurrentFrame.mvKeys;
     N = mvCurrentKeys.size();
+    mvEliminatedKeys=pTracker->mCurrentFrame.mvEliminatedKeys;
     mvCurrentObjects=pTracker->mCurrentFrame.mvObjects;
     mvbVO = vector<bool>(N,false);
     mvbMap = vector<bool>(N,false);

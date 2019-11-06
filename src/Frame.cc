@@ -41,6 +41,7 @@ Frame::Frame(const Frame &frame)
      mTimeStamp(frame.mTimeStamp), mK(frame.mK.clone()), mDistCoef(frame.mDistCoef.clone()),
      mbf(frame.mbf), mb(frame.mb), mThDepth(frame.mThDepth), N(frame.N), mvKeys(frame.mvKeys),
      mvKeysRight(frame.mvKeysRight), mvKeysUn(frame.mvKeysUn),
+     mvEliminatedKeys(frame.mvEliminatedKeys), mvEliminatedKeysRight(frame.mvEliminatedKeysRight),
      mvObjects(frame.mvObjects), mvObjectsRight(frame.mvObjectsRight), mvuRight(frame.mvuRight),
      mvDepth(frame.mvDepth), mBowVec(frame.mBowVec), mFeatVec(frame.mFeatVec),
      mDescriptors(frame.mDescriptors.clone()), mDescriptorsRight(frame.mDescriptorsRight.clone()),
@@ -251,9 +252,9 @@ void Frame::AssignFeaturesToGrid()
 void Frame::ExtractORB(int flag, const cv::Mat &im)
 {
     if(flag==0)
-        (*mpORBextractorLeft)(im,cv::Mat(),mvKeys,mDescriptors,mvObjects);
+        (*mpORBextractorLeft)(im,cv::Mat(),mvKeys,mDescriptors,mvEliminatedKeys,mvObjects);
     else
-        (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight,mvObjectsRight);
+        (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight,mvEliminatedKeysRight,mvObjectsRight);
 }
 
 void Frame::SetPose(cv::Mat Tcw)

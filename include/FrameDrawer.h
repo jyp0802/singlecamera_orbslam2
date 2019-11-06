@@ -56,6 +56,9 @@ protected:
     cv::Mat mIm;
     int N;
     vector<cv::KeyPoint> mvCurrentKeys;
+    // Keypoints that were eliminated
+    vector<cv::KeyPoint> mvEliminatedKeys;
+    // Bounding boxes of objects that are eliminated
     vector<cv::Rect> mvCurrentObjects;
     vector<bool> mvbMap, mvbVO;
     bool mbOnlyTracking;
