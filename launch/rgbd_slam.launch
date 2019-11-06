@@ -1,4 +1,6 @@
 <launch>
+    <include file="$(find darknet_ros)/launch/yolo_orbslam.launch"/>
+    
     <node pkg="singlecamera_orbslam2" type="rgbd_slam_node" name="rgbd_slam" output="screen"
         args="$(find singlecamera_orbslam2)/Vocabulary/ORBvoc.txt $(find singlecamera_orbslam2)/Settings/D435.yaml world camera_pose"/>
 </launch>
