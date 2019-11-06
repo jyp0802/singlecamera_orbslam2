@@ -1,4 +1,6 @@
 <launch>
+    <include file="$(find darknet_ros)/launch/yolo_orbslam.launch"/>
+
     <arg name="load" default="none"/>
     <arg name="save" default="none"/>
     <node pkg="singlecamera_orbslam2" type="rgbd_slam_node" name="rgbd_slam" output="screen"

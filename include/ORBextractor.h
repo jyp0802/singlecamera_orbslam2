@@ -58,7 +58,9 @@ public:
     // Mask is ignored in the current implementation.
     void operator()( cv::InputArray image, cv::InputArray mask,
       std::vector<cv::KeyPoint>& keypoints,
-      cv::OutputArray descriptors);
+      cv::OutputArray descriptors,
+      std::vector<cv::KeyPoint>& eliminatedKeypoints, // keypoints that are eliminated
+      std::vector<cv::Rect>& objects); // bounding boxes of eliminated objects
 
     int inline GetLevels(){
         return nlevels;}
