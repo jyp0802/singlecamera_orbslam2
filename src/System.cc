@@ -36,8 +36,8 @@ namespace ORB_SLAM2
 {
 
 System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
-               const bool bUseViewer, string loadMap, string saveMap): mLoadMap(loadMap), mSaveMap(saveMap), mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false),mbActivateLocalizationMode(false),
-        mbDeactivateLocalizationMode(false)
+               const bool bUseViewer, string loadMap, string saveMap): mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false),mbActivateLocalizationMode(false),
+        mbDeactivateLocalizationMode(false), mLoadMap(loadMap), mSaveMap(saveMap)
 {
     // Output welcome message
     cout << endl <<

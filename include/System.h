@@ -179,8 +179,8 @@ private:
     std::mutex mMutexState;
     
     // Save map
-    string mSaveMap;
     string mLoadMap;
+    string mSaveMap;
     string mapfile;
 };
 
