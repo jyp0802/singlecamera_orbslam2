@@ -479,6 +479,8 @@ void Tracking::Track()
                 mpSystem->Reset();
                 return;
             }
+            if (mlRelativeFramePoses.size() < 2)
+                return;
         }
 
         if(!mCurrentFrame.mpReferenceKF)
