@@ -145,8 +145,8 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
             mDepthMapFactor = 1.0f/mDepthMapFactor;
     }
 
-    if (bReuseMap)
-        mState = LOST;
+    // if (bReuseMap)
+    //     mState = LOST;
 
 }
 
