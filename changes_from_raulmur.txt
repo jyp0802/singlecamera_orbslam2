@@ -1,0 +1,26 @@
+Website: https://github.com/raulmur/ORB_SLAM2
+
+1. Clone the repository
+	git clone https://github.com/raulmur/ORB_SLAM2.git ORB_SLAM2
+
+2. Run the build.sh script
+	cd ORB_SLAM2
+	chmod +x build.sh
+	./build.sh
+
+FOR ROS 
+
+1. Follow https://github.com/raulmur/ORB_SLAM2#7-ros-examples
+
+2. Correct some files
+	1. Add Boost dependency - https://github.com/raulmur/ORB_SLAM2/pull/507
+	2. Publish tf for rgbd - https://github.com/raulmur/ORB_SLAM2/pull/102
+		- new link https://github.com/raulmur/ORB_SLAM2/pull/102#issuecomment-298233226
+
+3. Make RGBD.yaml file in Examples/RGB-D/ (copy TUM1.yaml) & Setup topic names for RGB-D camera
+	https://impulsiverobotics.com/2018/04/ros-enabled-omnidirectional-robot/
+	"Getting Camera Parameters"
+	"Setting up ROS node" - change topic names in line 68, 69 to "/camera/color/image_raw" and "/camera/depth/image_rect_raw"
+
+4. Execute build_ros.sh again
+	./build_ros.sh
