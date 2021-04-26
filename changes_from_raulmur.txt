@@ -24,3 +24,8 @@ FOR ROS
 
 4. Execute build_ros.sh again
 	./build_ros.sh
+
+
+REMEMBER:
+https://github.com/IntelRealSense/librealsense/blob/master/doc/installation.md
+https://github.com/IntelRealSense/librealsense/issues/4519
